@@ -1,0 +1,122 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base styles and CSS variables for theming */
+@layer base {
+  :root {
+    --color-primary: 220, 38, 38; /* Red color in RGB */
+    --color-background: 0, 0, 0;
+    --color-surface: 17, 17, 17;
+    --vh: 1vh; /* Dynamic viewport height fallback */
+  }
+
+  html {
+    @apply antialiased;
+  }
+
+  body {
+    @apply bg-black text-white;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-black;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-red-600 rounded;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-red-500;
+  }
+}
+
+/* Utility classes */
+@layer utilities {
+  /* Text gradients */
+  .text-gradient {
+    @apply bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent;
+  }
+
+  /* Glowing effects */
+  .glow-red {
+    filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.5));
+  }
+
+  /* Military-style borders */
+  .border-tactical {
+    @apply border-2 border-red-500/20;
+  }
+
+  /* Animated background */
+  .bg-tactical {
+    @apply bg-black;
+    background-image: 
+      linear-gradient(rgba(220, 38, 38, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(220, 38, 38, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+}
+
+/* Component-specific styles */
+@layer components {
+  /* Buttons */
+  .btn-tactical {
+    @apply px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg uppercase tracking-wider transition-all duration-200 transform hover:scale-105;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white font-medium rounded-lg transition-all duration-200;
+  }
+
+  /* Cards */
+  .card-tactical {
+    @apply bg-gray-900/50 backdrop-blur-sm border border-red-500/20 rounded-xl p-6;
+  }
+
+  /* Input fields */
+  .input-tactical {
+    @apply w-full px-4 py-3 bg-gray-900/50 border-2 border-red-500/20 rounded-lg text-white placeholder-gray-500 focus:border-red-500 focus:outline-none transition-all duration-200;
+  }
+}
+
+/* Animations */
+@keyframes tactical-pulse {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes tactical-shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+  20%, 40%, 60%, 80% { transform: translateX(2px); }
+}
+
+.animate-tactical-pulse {
+  animation: tactical-pulse 2s ease-in-out infinite;
+}
+
+.animate-tactical-shake {
+  animation: tactical-shake 0.5s ease-out;
+}
+
+/* Font families */
+.font-orbitron {
+  font-family: 'Orbitron', monospace;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}

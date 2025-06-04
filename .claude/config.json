@@ -1,0 +1,37 @@
+{
+  "model": "claude-3-5-sonnet-20241022",
+  "customCommands": {
+    "start": {
+      "description": "Start the development server",
+      "command": "./start.sh"
+    },
+    "test-flow": {
+      "description": "Test complete user flow",
+      "steps": [
+        "Open browser at localhost:5173",
+        "Test auth with multiple users",
+        "Test XP gain/loss mechanics",
+        "Verify theme application",
+        "Check punishment system"
+      ]
+    },
+    "debug-state": {
+      "description": "Check application state in browser console",
+      "commands": [
+        "debug.stats()",
+        "debug.user()",
+        "debug.authStats()"
+      ]
+    }
+  },
+  "projectPreferences": {
+    "codeStyle": "military-themed-functional",
+    "maxFileLines": 800,
+    "preferredPatterns": [
+      "Component composition",
+      "Single responsibility",
+      "Predictable XP calculations",
+      "Military naming conventions"
+    ]
+  }
+}

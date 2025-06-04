@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="military">
+<head>
+  <!-- ╭──────────────────────────────────────────────────────────────────╮ -->
+  <!-- │ 🎯 CONTROL STATION OS - TACTICAL ENTRY POINT                     │ -->
+  <!-- │ Military-Grade Progressive Web App                               │ -->
+  <!-- │ Version: 0.1-ALPHA | NO MERCY MODE                              │ -->
+  <!-- ╰──────────────────────────────────────────────────────────────────╯ -->
+  
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  
+  <!-- TACTICAL METADATA -->
+  <title>CONTROL STATION OS | Military-Grade Productivity</title>
+  <meta name="description" content="The productivity system that punishes failure. XP loss, level demotion, and fear-driven task management. Not for the weak." />
+  <meta name="keywords" content="productivity, punishment, discipline, task management, gamification, XP system" />
+  <meta name="author" content="Control Station Command" />
+  <meta name="robots" content="index, follow" />
+  
+  <!-- THEME & APPEARANCE -->
+  <meta name="theme-color" content="#DC2626" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Control Station" />
+  
+  <!-- SOCIAL MEDIA OPTIMIZATION -->
+  <meta property="og:title" content="CONTROL STATION OS - No Mercy Productivity" />
+  <meta property="og:description" content="The only productivity app that punishes failure. Lose XP. Drop levels. Feel the fear." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://controlstation.app" />
+  <meta property="og:image" content="/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  
+  <!-- TWITTER CARD -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="CONTROL STATION OS" />
+  <meta name="twitter:description" content="Military-grade productivity. Punishment guaranteed." />
+  <meta name="twitter:image" content="/twitter-card.png" />
+  
+  <!-- FAVICON CONFIGURATION -->
+  <link rel="icon" type="image/png" href="/icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/icon.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/icon.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/icon.png" />
+  <link rel="manifest" href="/manifest.json" />
+  
+  <!-- PRECONNECT FOR PERFORMANCE -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  
+  <!-- REMOVED PRELOADS - CAUSING ERRORS AND DELAYS -->
+  
+  <!-- TACTICAL FONTS -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  
+  <!-- CRITICAL STYLES FOR BOOT SEQUENCE -->
+  <style>
+    /* RESET & BASE */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    html {
+      height: 100%;
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: #000000;
+      color: #FFFFFF;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    #root {
+      height: 100%;
+      isolation: isolate;
+    }
+    
+    /* TACTICAL BOOT SCREEN */
+    #boot-screen {
+      position: fixed;
+      inset: 0;
+      background: #000000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease-out;
+      height: calc(var(--vh, 1vh) * 100);
+    }
+    
+    #boot-screen.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+    
+    .boot-container {
+      text-align: center;
+      padding: 2rem;
+    }
+    
+    /* ANIMATED LOGO */
+    .boot-logo {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 2rem;
+      position: relative;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    .boot-logo svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 0 30px rgba(239, 68, 68, 0.5));
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.05); opacity: 1; }
+    }
+    
+    /* BOOT TEXT */
+    .boot-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 2rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(45deg, #DC2626, #EF4444);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .boot-subtitle {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.875rem;
+      color: #EF4444;
+      opacity: 0.8;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      margin-bottom: 3rem;
+    }
+    
+    /* LOADING BAR */
+    .boot-progress {
+      width: 300px;
+      max-width: 90vw;
+      height: 4px;
+      background: rgba(239, 68, 68, 0.2);
+      border-radius: 2px;
+      overflow: hidden;
+      margin: 0 auto;
+    }
+    
+    .boot-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #DC2626, #EF4444);
+      width: 0%;
+      animation: load 2s ease-out forwards;
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+    }
+    
+    @keyframes load {
+      0% { width: 0%; }
+      10% { width: 15%; }
+      30% { width: 35%; }
+      50% { width: 55%; }
+      70% { width: 75%; }
+      90% { width: 90%; }
+      100% { width: 100%; }
+    }
+    
+    /* STATUS MESSAGES */
+    .boot-status {
+      margin-top: 2rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: #10B981;
+      opacity: 0;
+      animation: fadeIn 0.5s ease-out 0.5s forwards;
+    }
+    
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+    
+    /* TACTICAL GRID BACKGROUND */
+    .boot-grid {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(rgba(239, 68, 68, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(239, 68, 68, 0.03) 1px, transparent 1px);
+      background-size: 50px 50px;
+      opacity: 0.5;
+      animation: slide 20s linear infinite;
+    }
+    
+    @keyframes slide {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(50px, 50px); }
+    }
+    
+    /* SCAN LINE EFFECT */
+    .scan-line {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.8), transparent);
+      animation: scan 3s linear infinite;
+    }
+    
+    @keyframes scan {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(100vh); }
+    }
+    
+    /* NO SCRIPT WARNING */
+    noscript {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 10000;
+    }
+    
+    .noscript-warning {
+      text-align: center;
+      padding: 2rem;
+      max-width: 500px;
+    }
+    
+    .noscript-warning h1 {
+      font-family: 'Orbitron', monospace;
+      font-size: 2rem;
+      color: #EF4444;
+      margin-bottom: 1rem;
+    }
+    
+    .noscript-warning p {
+      color: #EF4444;
+      opacity: 0.8;
+      line-height: 1.6;
+    }
+    
+    /* PERFORMANCE OPTIMIZATIONS */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+    
+    /* HIGH CONTRAST MODE */
+    @media (prefers-contrast: high) {
+      .boot-logo svg {
+        filter: drop-shadow(0 0 40px rgba(239, 68, 68, 0.8));
+      }
+      
+      .boot-progress {
+        border: 1px solid #EF4444;
+      }
+    }
+    
+    /* MOBILE OPTIMIZATIONS */
+    @media (max-width: 640px) {
+      .boot-title {
+        font-size: 1.5rem;
+      }
+      
+      .boot-subtitle {
+        font-size: 0.75rem;
+      }
+      
+      .boot-logo {
+        width: 80px;
+        height: 80px;
+      }
+    }
+  </style>
+  
+  <!-- VITE MODULE SCRIPT -->
+  <script type="module" src="/src/app/main.jsx"></script>
+  
+  <!-- Block Chrome Extension Interference -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' http://localhost:* ws://localhost:* https://fonts.googleapis.com https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval'">
+</head>
+<body>
+  <!-- NO JAVASCRIPT WARNING -->
+  <noscript>
+    <div class="noscript-warning">
+      <h1>⚠️ JAVASCRIPT REQUIRED</h1>
+      <p>
+        Control Station OS requires JavaScript to enforce discipline and track your failures.
+        Enable JavaScript or face eternal mediocrity.
+      </p>
+    </div>
+  </noscript>
+  
+  <!-- REACT ROOT -->
+  <div id="root"></div>
+  
+  <!-- TACTICAL BOOT SCREEN -->
+  <div id="boot-screen">
+    <div class="boot-grid"></div>
+    <div class="scan-line"></div>
+    
+    <div class="boot-container">
+      <!-- ANIMATED SVG LOGO -->
+      <div class="boot-logo">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <!-- Outer Ring -->
+          <circle cx="50" cy="50" r="45" fill="none" stroke="#DC2626" stroke-width="2" opacity="0.5" />
+          <circle cx="50" cy="50" r="40" fill="none" stroke="#EF4444" stroke-width="1" opacity="0.8" />
+          
+          <!-- Crosshair -->
+          <line x1="50" y1="10" x2="50" y2="90" stroke="#EF4444" stroke-width="2" />
+          <line x1="10" y1="50" x2="90" y2="50" stroke="#EF4444" stroke-width="2" />
+          
+          <!-- Center Target -->
+          <circle cx="50" cy="50" r="15" fill="none" stroke="#DC2626" stroke-width="3" />
+          <circle cx="50" cy="50" r="5" fill="#EF4444" />
+          
+          <!-- Corner Marks -->
+          <path d="M 20 20 L 30 20 L 20 30" fill="none" stroke="#EF4444" stroke-width="2" />
+          <path d="M 80 20 L 70 20 L 80 30" fill="none" stroke="#EF4444" stroke-width="2" />
+          <path d="M 20 80 L 30 80 L 20 70" fill="none" stroke="#EF4444" stroke-width="2" />
+          <path d="M 80 80 L 70 80 L 80 70" fill="none" stroke="#EF4444" stroke-width="2" />
+        </svg>
+      </div>
+      
+      <h1 class="boot-title">Control Station</h1>
+      <p class="boot-subtitle">Initializing Security Protocols...</p>
+      
+      <div class="boot-progress">
+        <div class="boot-progress-bar"></div>
+      </div>
+      
+      <div class="boot-status">SYSTEM ARMED • NO MERCY MODE ACTIVE</div>
+    </div>
+  </div>
+  
+  <!-- BOOT SEQUENCE SCRIPT -->
+  <script>
+    (function() {
+      // Set dynamic viewport height immediately to prevent layout shifts
+      function setViewportHeight() {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', vh + 'px');
+      }
+      
+      // Advanced Tactical Audio System
+      class TacticalBootAudio {
+        constructor() {
+          this.audioContext = null;
+          this.isEnabled = true;
+          this.sounds = [];
+          this.init();
+        }
+        
+        init() {
+          try {
+            // Don't create AudioContext immediately to avoid console warnings
+            this.audioContext = null;
+          } catch (e) {
+            console.log('Audio not supported');
+            this.isEnabled = false;
+          }
+        }
+        
+        initAudioContext() {
+          if (this.audioContext) return true;
+          try {
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            return true;
+          } catch (e) {
+            console.log('Audio not supported');
+            this.isEnabled = false;
+            return false;
+          }
+        }
+        
+        // Create hacking/digital boot sounds
+        playDigitalBeep(frequency = 800, duration = 150, volume = 0.3) {
+          if (!this.isEnabled) return;
+          if (!this.initAudioContext()) return;
+          
+          const oscillator = this.audioContext.createOscillator();
+          const gainNode = this.audioContext.createGain();
+          
+          oscillator.connect(gainNode);
+          gainNode.connect(this.audioContext.destination);
+          
+          oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+          oscillator.type = 'square'; // Digital/harsh sound
+          
+          gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+          gainNode.gain.linearRampToValueAtTime(volume, this.audioContext.currentTime + 0.01);
+          gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + duration / 1000);
+          
+          oscillator.start(this.audioContext.currentTime);
+          oscillator.stop(this.audioContext.currentTime + duration / 1000);
+        }
+        
+        playBootSequence() {
+          if (!this.isEnabled) return;
+          
+          // Digital handshake sequence
+          setTimeout(() => this.playDigitalBeep(1200, 80, 0.2), 100);
+          setTimeout(() => this.playDigitalBeep(800, 80, 0.2), 200);
+          setTimeout(() => this.playDigitalBeep(1000, 80, 0.2), 300);
+          
+          // System initialization
+          setTimeout(() => this.playDigitalBeep(600, 120, 0.3), 800);
+          setTimeout(() => this.playDigitalBeep(900, 100, 0.25), 1200);
+          
+          // Ready signal
+          setTimeout(() => {
+            this.playDigitalBeep(1400, 200, 0.4);
+            setTimeout(() => this.playDigitalBeep(1600, 150, 0.3), 100);
+          }, 2500);
+        }
+        
+        playProgressBeep() {
+          if (!this.isEnabled) return;
+          this.playDigitalBeep(1000 + Math.random() * 400, 60, 0.15);
+        }
+      }
+      
+      // Initialize tactical audio
+      const tacticalAudio = new TacticalBootAudio();
+      
+      // Initialize immediately
+      setViewportHeight();
+      
+      // Update on resize and orientation change
+      window.addEventListener('resize', setViewportHeight);
+      window.addEventListener('orientationchange', function() {
+        setTimeout(setViewportHeight, 100); // Small delay for orientation change
+      });
+      
+      // Start boot sequence audio
+      setTimeout(() => {
+        // User gesture required for audio, so we wait for the page to be interacted with
+        document.addEventListener('click', function playBootAudio() {
+          tacticalAudio.playBootSequence();
+          document.removeEventListener('click', playBootAudio);
+        }, { once: true });
+        
+        // Don't try to play immediately - wait for user interaction
+      }, 500);
+      
+      // Progress bar audio effects (only after user interaction)
+      let progressBeepInterval;
+      document.addEventListener('click', function startProgressAudio() {
+        progressBeepInterval = setInterval(() => {
+          tacticalAudio.playProgressBeep();
+        }, 300);
+        
+        setTimeout(() => {
+          clearInterval(progressBeepInterval);
+        }, 2000);
+        
+        document.removeEventListener('click', startProgressAudio);
+      }, { once: true });
+      
+      // Hide boot screen after React loads
+      let bootScreen = document.getElementById('boot-screen');
+      let hideBootScreen = function() {
+        if (bootScreen) {
+          bootScreen.classList.add('fade-out');
+          setTimeout(function() {
+            bootScreen.style.display = 'none';
+          }, 500);
+        }
+      };
+      
+      // Auto-hide after max 0.5 seconds for faster loading
+      setTimeout(hideBootScreen, 500);
+      
+      // Hide when React mounts
+      window.addEventListener('appMounted', hideBootScreen);
+      
+      // Console warnings (delayed to avoid conflicts)
+      setTimeout(() => {
+        try {
+          console.log('%c⚠️ CONTROL STATION OS', 'color: #EF4444; font-size: 24px; font-weight: bold;');
+          console.log('%cUnauthorized access will be punished.', 'color: #EF4444; font-size: 14px;');
+          console.log('%cProductivity through fear. No mercy mode active.', 'color: #10B981; font-size: 12px;');
+        } catch (e) {
+          // Silently handle console errors
+        }
+      }, 100);
+      
+      // Prevent right-click in production
+      if (window.location.hostname !== 'localhost') {
+        document.addEventListener('contextmenu', function(e) {
+          e.preventDefault();
+          return false;
+        });
+      }
+      
+      // Service Worker Registration (for PWA)
+      if ('serviceWorker' in navigator && window.location.hostname !== 'localhost') {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/sw.js').then(
+            function(registration) {
+              console.log('Service Worker registered:', registration.scope);
+            },
+            function(err) {
+              console.log('Service Worker registration failed:', err);
+            }
+          );
+        });
+      }
+      
+      // Performance timing (with error handling)
+      window.addEventListener('load', function() {
+        // Removed performance timing to reduce overhead
+      });
+    })();
+  </script>
+</body>
+</html>
+
+<!-- ╭──────────────────────────────────────────────────────────────────────╮ -->
+<!-- │ 🎯 END OF index.html - TACTICAL ENTRY POINT                          │ -->
+<!-- │ Military-grade HTML with boot sequence and punishment protocols      │ -->
+<!-- │ Ready for deployment, Commander!                                     │ -->
+<!-- ╰──────────────────────────────────────────────────────────────────────╯ -->
