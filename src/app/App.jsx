@@ -26,15 +26,15 @@ import { DailyLoginBonusPopup } from '../features/auth/DailyLoginBonus'
 
 // Extracted components
 import PunishmentOverlay from '../features/dashboard/PunishmentOverlay'
-import DeveloperTools from '../components/shared/DeveloperTools'
+// import DeveloperTools from '../components/shared/DeveloperTools' // REMOVED: To be repositioned later
 // SettingsView will be lazy loaded below
 import AchievementTestPanel from '../features/achievements/AchievementTestPanel'
 import TacticalErrorBoundary from '../components/layout/TacticalErrorBoundary'
 import CommandPalette from '../components/shared/CommandPalette'
 import KeyboardShortcuts from '../components/shared/KeyboardShortcuts'
-import FeedbackCollector from '../components/shared/FeedbackCollector'
-import DailyUseTracker from '../components/shared/DailyUseTracker'
-import DebugOverlay from '../components/shared/DebugOverlay'
+// import FeedbackCollector from '../components/shared/FeedbackCollector' // REMOVED: To be repositioned later
+// import DailyUseTracker from '../components/shared/DailyUseTracker' // REMOVED: To be repositioned later
+// import DebugOverlay from '../components/shared/DebugOverlay' // REMOVED: To be repositioned later
 // import { 
 //   AccessibilityProvider, 
 //   ScreenReaderAnnouncements, 
@@ -52,8 +52,8 @@ const IntelligenceHub = React.lazy(() =>
 const MissionControl = React.lazy(() => 
   import('../features/missions/MissionControl').then(module => ({ default: module.default }))
 )
-const FocusGuardian = React.lazy(() => 
-  import('../features/focus/EnhancedFocusGuardian').then(module => ({ default: module.default }))
+const UltimateFocusGuardian = React.lazy(() => 
+  import('../features/focus/UltimateFocusGuardian').then(module => ({ default: module.default }))
 )
 const AchievementsView = React.lazy(() => 
   import('../features/achievements/AchievementsView').then(module => ({ default: module.default }))
@@ -578,7 +578,22 @@ function App() {
         case 'focus': {
           return (
             <Suspense fallback={<LoadingFallback />}>
-              <FocusGuardian onXPAnimation={triggerXP} />
+              <UltimateFocusGuardian onXPAnimation={triggerXP} initialTab="timer" />
+            </Suspense>
+          )
+        }
+        // Legacy routes for backwards compatibility - redirect to focus with specific tabs
+        case 'focustest': {
+          return (
+            <Suspense fallback={<LoadingFallback />}>
+              <UltimateFocusGuardian onXPAnimation={triggerXP} initialTab="debug" />
+            </Suspense>
+          )
+        }
+        case 'activity': {
+          return (
+            <Suspense fallback={<LoadingFallback />}>
+              <UltimateFocusGuardian onXPAnimation={triggerXP} initialTab="activity" />
             </Suspense>
           )
         }
@@ -748,8 +763,8 @@ function App() {
             )}
           </AnimatePresence>
           
-          {/* Developer Tools */}
-          <DeveloperTools />
+          {/* Developer Tools - REMOVED: To be repositioned later */}
+          {/* <DeveloperTools /> */}
           
           {/* Achievement Test Panel (dev only) - REMOVED for production */}
           {/* <AchievementTestPanel /> */}
@@ -774,14 +789,14 @@ function App() {
             onClose={() => setShowKeyboardShortcuts(false)}
           />
           
-          {/* Feedback Collector */}
-          <FeedbackCollector trigger="manual" />
+          {/* Feedback Collector - REMOVED: To be repositioned later */}
+          {/* <FeedbackCollector trigger="manual" /> */}
           
-          {/* Daily Use Tracker */}
-          <DailyUseTracker />
+          {/* Daily Use Tracker - REMOVED: To be repositioned later */}
+          {/* <DailyUseTracker /> */}
           
-          {/* Debug Overlay - Development Only */}
-          <DebugOverlay />
+          {/* Debug Overlay - Development Only - REMOVED: To be repositioned later */}
+          {/* <DebugOverlay /> */}
           </Layout>
         )}
       </div>

@@ -215,7 +215,7 @@ export default function TacticalHeader({ onOpenProfile, onLogout }) {
                         </div>
                         <div className="text-center">
                           <p className="text-xs text-white/40 uppercase">Points</p>
-                          <p className="text-lg font-bold text-blue-400">{totalXP.toLocaleString()}</p>
+                          <p className="text-lg font-bold text-blue-400">{(totalXP || 0).toLocaleString()}</p>
                         </div>
                       </div>
                     </div>

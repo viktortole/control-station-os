@@ -23,8 +23,8 @@ class FocusGuardianService {
     
     // Connection state
     this.baseUrl = 'localhost:8000'
-    this.wsUrl = `ws://${this.baseUrl}/focus/ws`
-    this.apiUrl = `http://${this.baseUrl}/focus`
+    this.wsUrl = `ws://${this.baseUrl}/ws/focus`
+    this.apiUrl = `http://${this.baseUrl}/api/focus`
     
     // Timeout and interval management
     this.connectionTimeout = null
@@ -34,9 +34,15 @@ class FocusGuardianService {
   // Connection Management
   async connect() {
     if (this.isConnecting || this.isConnected || !this.shouldReconnect) {
+      console.log('🔄 Connect skipped:', { 
+        isConnecting: this.isConnecting, 
+        isConnected: this.isConnected, 
+        shouldReconnect: this.shouldReconnect 
+      })
       return
     }
 
+    console.log('🔌 Attempting WebSocket connection to:', this.wsUrl)
     this.isConnecting = true
     
     // Clear any existing timeouts
@@ -45,25 +51,19 @@ class FocusGuardianService {
     }
     
     try {
-      // Silent connection attempts to reduce console noise
-      
       this.ws = new WebSocket(this.wsUrl)
       this.setupEventHandlers()
       
       // Connection timeout - reduced to 5 seconds
       this.connectionTimeout = setTimeout(() => {
         if (!this.isConnected) {
-          if (this.reconnectAttempts === 0) {
-            console.warn('⚠️ WebSocket connection timeout - Focus Guardian service may not be running')
-          }
+          console.warn('⚠️ WebSocket connection timeout - Focus Guardian service may not be running')
           this.handleConnectionError(new Error('Connection timeout'))
         }
       }, 5000)
       
     } catch (error) {
-      if (this.reconnectAttempts === 0) {
-        console.error('❌ Failed to connect to Focus Guardian:', error)
-      }
+      console.error('❌ Failed to connect to Focus Guardian:', error)
       this.handleConnectionError(error)
     }
   }
@@ -124,12 +124,46 @@ class FocusGuardianService {
   }
 
   handleMessage(data) {
-    // Only log important messages to reduce console noise
-    if (data.type === 'handshake_response' || data.type === 'focus_session_update') {
-      console.log('📨 Focus Guardian message:', data.type)
-    }
+    // Log all message types for debugging
+    console.log('📨 Focus Guardian message:', data.type, data)
+    console.log('🔄 Activity callback status:', !!this.activityCallback)
     
     switch (data.type) {
+      case 'initial_status':
+      case 'status_update':
+        // Handle initial status and status updates
+        if (this.activityCallback && data.focus) {
+          this.activityCallback(data.focus)
+        }
+        break
+        
+      case 'focus_update':
+        // Handle focus updates from our new event system
+        if (this.activityCallback) {
+          this.activityCallback(data.data)
+        }
+        break
+        
+      case 'window_changed':
+        // Handle window change events
+        if (this.activityCallback) {
+          this.activityCallback({
+            ...data.data,
+            type: 'window_changed'
+          })
+        }
+        break
+        
+      case 'activity_logged':
+        // Handle activity logging events
+        if (this.activityCallback) {
+          this.activityCallback({
+            ...data.data,
+            type: 'activity_logged'
+          })
+        }
+        break
+        
       case 'focus_session_update':
         if (this.sessionCallback) {
           this.sessionCallback(data.data, data.event)
@@ -137,8 +171,16 @@ class FocusGuardianService {
         break
         
       case 'activity_update':
+        // Legacy activity update handling
         if (this.activityCallback) {
           this.activityCallback(data.data)
+        }
+        break
+        
+      case 'pomodoro_update':
+        // Handle pomodoro updates
+        if (this.sessionCallback) {
+          this.sessionCallback(data.data, 'pomodoro_update')
         }
         break
         
@@ -158,8 +200,20 @@ class FocusGuardianService {
         console.log('🤝 Handshake successful:', data.data)
         break
         
+      case 'command_response':
+        console.log('⚡ Command response:', data)
+        break
+        
+      case 'pong':
+        console.log('🏓 Pong received')
+        break
+        
+      case 'error':
+        console.error('❌ WebSocket error:', data.message)
+        break
+        
       default:
-        console.log('❓ Unknown message type:', data.type)
+        console.log('❓ Unknown message type:', data.type, data)
     }
   }
 
@@ -229,6 +283,17 @@ class FocusGuardianService {
     this.disconnect()
     this.shouldReconnect = true
     this.reconnectAttempts = 0
+    
+    // Clear connection state
+    this.isConnected = false
+    this.isConnecting = false
+    
+    // Reset callback handlers
+    this.activityCallback = null
+    this.sessionCallback = null
+    this.metricsCallback = null
+    this.alertCallback = null
+    this.connectionCallback = null
   }
 
   // Session Management
@@ -377,7 +442,7 @@ class FocusGuardianService {
   // Health Check
   async healthCheck() {
     try {
-      const response = await fetch(`http://${this.baseUrl}/health`)
+      const response = await fetch(`http://${this.baseUrl}/api/health`)
       return response.ok
     } catch (error) {
       return false

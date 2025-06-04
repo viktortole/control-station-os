@@ -65,6 +65,17 @@ const DeveloperTools = () => {
         break
       }
         
+      case 'view': {
+        const newView = args[0]
+        if (newView && ['dashboard', 'tasks', 'focus', 'focustest', 'stats', 'achievements', 'settings'].includes(newView)) {
+          store.setView(newView)
+          result = `Switched to ${newView} view`
+        } else {
+          result = `Invalid view. Options: dashboard, tasks, focus, focustest, stats, achievements, settings`
+        }
+        break
+      }
+        
       case 'reset': {
         if (confirm('Reset all data?')) {
           localStorage.clear()
@@ -81,6 +92,7 @@ const DeveloperTools = () => {
 • level [number] - Set level
 • demote - Force demotion
 • tree [healthy|warning|dying] - Set tree health
+• view [name] - Switch view (focustest for backend test)
 • reset - Clear all data`
         break
       }

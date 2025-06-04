@@ -488,7 +488,7 @@ export function TacticalNavigation() {
       label: 'Focus Guardian', 
       icon: Brain, 
       badge: null,
-      description: 'Deep Work Mode'
+      description: 'Unified Focus System'
     },
     { 
       id: 'achievements', 
@@ -636,6 +636,7 @@ function MobileNav({ onClose }) {
     { id: 'dashboard', label: 'Command Center', icon: BarChart3, badge: null },
     { id: 'tasks', label: 'Missions', icon: Target, badge: activeTasks || null },
     { id: 'focus', label: 'Focus', icon: Brain, badge: null },
+    { id: 'activity', label: 'Activity', icon: Activity, badge: null },
     { id: 'achievements', label: 'Honors', icon: Trophy, badge: null },
     { id: 'stats', label: 'Intel', icon: TrendingUp, badge: null },
     { id: 'settings', label: 'Config', icon: Settings, badge: null },
