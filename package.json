@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "Military-grade productivity system with real consequences",
   "author": "Control Station Command",
-  "main": "electron/main.js",
+  "main": "electron/main.cjs",
   "homepage": "./",
   "scripts": {
     "dev": "vite",
@@ -69,7 +69,7 @@
     },
     "files": [
       "dist/**/*",
-      "electron/main.js",
+      "electron/main.cjs",
       "public/icon.png"
     ],
     "win": {

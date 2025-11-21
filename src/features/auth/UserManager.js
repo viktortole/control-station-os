@@ -1,3 +1,4 @@
+import { ADMIN_USERNAME, ADMIN_PASSWORD, ADMIN_PROFILE } from '../../shared/config/adminAuth'
 // ╭──────────────────────────────────────────────────────────────────────────────╮
 // │ 📁 FILE: src/core/auth/UserManager.js                                        │
 // │ 🎯 PURPOSE: Multi-user session management and data isolation                │
@@ -19,6 +20,87 @@ export class UserManager {
   static SETTINGS_PREFIX = 'control_station_settings_'
   static SESSION_KEY = 'control_station_current_user'
   static LAST_USER_KEY = 'control_station_last_user'
+
+  /**
+   * Ensure built-in admin account exists with expected password/profile.
+   * Provides a consistent authenticated path rather than skipping auth.
+   */
+  static ensureAdminAccount() {
+    if (!ADMIN_USERNAME) return
+    const username = ADMIN_USERNAME.trim().toLowerCase()
+    const desiredHash = ADMIN_PASSWORD ? btoa(ADMIN_PASSWORD) : null
+    const existing = this._getInternalUserData(username)
+
+    const baseProfile = {
+      username,
+      createdAt: new Date().toISOString(),
+      lastLogin: existing?.lastLogin || null,
+      isFirstTime: false,
+      profile: {
+        displayName: ADMIN_USERNAME,
+        nickname: ADMIN_USERNAME,
+        avatar: ADMIN_PROFILE.avatar || 'tactical-1',
+        rank: ADMIN_PROFILE.rank || 'COMMANDER',
+        clearanceLevel: ADMIN_PROFILE.clearanceLevel || 'ADMIN',
+        specialization: ADMIN_PROFILE.specialization || 'intelligence',
+        createdAt: existing?.profile?.createdAt || new Date().toISOString(),
+        ...ADMIN_PROFILE
+      },
+      preferences: {
+        theme: 'military',
+        soundEnabled: true,
+        punishmentEnabled: false,
+        idleTrackingEnabled: false,
+        ...ADMIN_PROFILE.preferences
+      },
+      security: {
+        passwordHash: desiredHash,
+        securityLevel: desiredHash ? 'protected' : 'open',
+        passwordUpdated: new Date().toISOString(),
+        registrationMethod: 'admin_auto_provision',
+        mfaEnabled: false,
+        securityQuestions: null
+      },
+      gameData: existing?.gameData || {
+        level: 1,
+        totalXP: 0,
+        streak: 0,
+        tasks: [],
+        achievements: [],
+        stats: {
+          totalTasksCompleted: 0,
+          totalTasksFailed: 0,
+          totalTasksAbandoned: 0,
+          totalDaysActive: 0,
+          totalXPLost: 0
+        }
+      }
+    }
+
+    if (!existing) {
+      this.setUserData(baseProfile, username, { force: true })
+      return
+    }
+
+    let needsUpdate = false
+    if (desiredHash && existing?.security?.passwordHash !== desiredHash) {
+      existing.security = {
+        ...(existing.security || {}),
+        passwordHash: desiredHash,
+        securityLevel: 'protected',
+        passwordUpdated: new Date().toISOString(),
+        registrationMethod: 'admin_auto_provision'
+      }
+      needsUpdate = true
+    }
+    if (existing?.profile?.clearanceLevel !== 'ADMIN') {
+      existing.profile = { ...(existing.profile || {}), clearanceLevel: 'ADMIN' }
+      needsUpdate = true
+    }
+    if (needsUpdate) {
+      this.setUserData(existing, username, { force: true })
+    }
+  }
 
   /* 🎯 PART 2: SESSION MANAGEMENT */
   
@@ -273,7 +355,8 @@ export class UserManager {
    * @param {object} data - Data to save (will be sanitized)
    * @param {string} username - Commander's username (optional, uses current if not provided)
    */
-  static setUserData(data, username = null) {
+  static setUserData(data, username = null, options = {}) {
+    const { force = false } = options
     const user = username || this.getCurrentUser()
     if (!user) {
       console.warn('No user specified and no user logged in, cannot save data')
@@ -282,7 +365,7 @@ export class UserManager {
     
     // SECURITY: Prevent cross-user data access (except during registration)
     const currentUser = this.getCurrentUser()
-    if (username && currentUser && username !== currentUser) {
+    if (!force && username && currentUser && username !== currentUser) {
       console.warn('🚨 Security: Attempt to access other user data blocked')
       return false
     }
@@ -715,7 +798,7 @@ export class UserManager {
   }
 }
 
-/* 🚀 PART 9: DEVELOPMENT HELPERS */
+/* DEV HELPERS */
 if (import.meta.env.DEV && typeof window !== 'undefined') {
   // Attach to window for debugging
   window.UserManager = UserManager
@@ -724,17 +807,15 @@ if (import.meta.env.DEV && typeof window !== 'undefined') {
   if (window.location?.search?.includes('debug=true')) {
     setTimeout(() => {
       console.log(`
-╔════════════════════════════════════════════════════════╗
-║                                                        ║
-║  Debug Commands:                                       ║
-║  • UserManager.getCurrentUser()                       ║
-║  • UserManager.listAllUsers()                         ║
-║  • UserManager.getUserData()                          ║
-║  • UserManager.getStorageInfo()                       ║
-║  • UserManager.switchUser('username')                 ║
-║  • UserManager.logout()                                ║
-╚════════════════════════════════════════════════════════╝
-      `)
+============================================================
+  Debug Commands:
+    - UserManager.getCurrentUser()
+    - UserManager.listAllUsers()
+    - UserManager.getUserData()
+    - UserManager.getStorageInfo()
+    - UserManager.switchUser("<username>")
+    - UserManager.logout()
+============================================================`)
     }, 1000)
   }
 }

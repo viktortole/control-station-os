@@ -31,6 +31,9 @@ const useAuthStore = create((set, get) => ({
    */
   initialize: () => {
     try {
+      // Ensure admin account exists for controlled quick login
+      UserManager.ensureAdminAccount()
+
       const currentUser = UserManager.getCurrentUser()
       const availableUsers = UserManager.listAllUsers()
       

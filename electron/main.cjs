@@ -1,7 +1,8 @@
 /* eslint-env node */
 const { app, BrowserWindow, Menu, shell, dialog } = require('electron')
 const path = require('path')
-const isDev = process.env.NODE_ENV === 'development'
+const isDev = !app.isPackaged && process.env.NODE_ENV !== 'production'
+const devUrl = process.env.ELECTRON_DEV_URL || process.env.VITE_DEV_SERVER_URL || 'http://localhost:5173'
 
 // Keep a global reference of the window object
 let mainWindow
@@ -13,6 +14,9 @@ function createWindow() {
     height: 900,
     minWidth: 1200,
     minHeight: 700,
+    autoHideMenuBar: true,
+    titleBarStyle: 'hidden',
+    trafficLightPosition: { x: 12, y: 12 },
     // icon: path.join(__dirname, '../public/icon.png'), // Optional
     webPreferences: {
       nodeIntegration: false,
@@ -28,9 +32,7 @@ function createWindow() {
 
   // Load the app
   if (isDev) {
-    mainWindow.loadURL('http://localhost:5175')
-    // Open DevTools in development
-    mainWindow.webContents.openDevTools()
+    mainWindow.loadURL(devUrl)
   } else {
     // In production, load the built files
     mainWindow.loadFile(path.join(__dirname, '../dist/index.html'))
@@ -239,7 +241,7 @@ app.on('web-contents-created', (event, contents) => {
   contents.on('will-navigate', (event, navigationUrl) => {
     const parsedUrl = new URL(navigationUrl)
     
-    if (parsedUrl.origin !== 'http://localhost:5175' && !navigationUrl.startsWith('file://')) {
+    if (parsedUrl.origin !== 'http://localhost:5173' && !navigationUrl.startsWith('file://')) {
       event.preventDefault()
     }
   })

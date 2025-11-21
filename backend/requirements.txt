@@ -11,7 +11,7 @@ pywin32==306; sys_platform == "win32"
 sqlalchemy==2.0.23
 sqlite3-to-mysql==1.5.8
 pydantic==2.5.0
-pydantic-settings==2.1.0
+pydantic-settings==2.3.4
 
 # Notifications (from original pomodoro_engine.py)
 plyer==2.1.0
