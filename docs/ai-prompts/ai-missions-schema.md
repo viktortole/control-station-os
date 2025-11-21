@@ -2,12 +2,13 @@ AI Mission Schema
 =================
 Purpose: keep AI work in sync with the Missions module. Each Codex reply returns a mission_update JSON payload that the app can ingest.
 
-Status values: planned | in_progress | blocked | done
-Priority: P0 (critical), P1 (high), P2 (normal), P3 (low)
-Domain tags: frontend, backend, qa, infra, security, data
-Agent roles: orchestrator, agent-frontend, agent-backend, agent-qa, agent-infra, agent-security, agent-data
+Status values: planned | in_progress | blocked | done  
+Priority: P0 (critical), P1 (high), P2 (normal), P3 (low)  
+Domain tags (allowed): frontend, backend, qa, infra, security, data  
+Agent roles: orchestrator, agent-frontend, agent-backend, agent-qa, agent-infra, agent-security, agent-data  
+repo_paths must be relative to the repo root (no absolute paths).
 
-Create/update payload (return at end of each Codex reply):
+Create/update payload (return at end of each Codex reply; wrap in a code block):
 {
   "mission_update": {
     "id": "MISSION-YYYYMMDD-<slug>",
