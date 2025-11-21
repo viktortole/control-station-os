@@ -4,8 +4,10 @@ import { UserManager } from '../features/auth/UserManager'
 describe('UserManager', () => {
   beforeEach(() => {
     // Clear storage before each test
-    global.localStorage = {}
-    global.sessionStorage = {}
+    window.localStorage.clear()
+    window.sessionStorage.clear()
+    global.localStorage = window.localStorage
+    global.sessionStorage = window.sessionStorage
     vi.clearAllMocks()
   })
 

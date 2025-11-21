@@ -716,12 +716,12 @@ export class UserManager {
 }
 
 /* 🚀 PART 9: DEVELOPMENT HELPERS */
-if (import.meta.env.DEV) {
+if (import.meta.env.DEV && typeof window !== 'undefined') {
   // Attach to window for debugging
   window.UserManager = UserManager
-  
+
   // Only show debug commands when explicitly requested
-  if (window.location.search.includes('debug=true')) {
+  if (window.location?.search?.includes('debug=true')) {
     setTimeout(() => {
       console.log(`
 ╔════════════════════════════════════════════════════════╗

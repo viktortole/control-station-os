@@ -6,8 +6,10 @@ describe('useGameStore', () => {
   beforeEach(() => {
     // Reset store state before each test
     useGameStore.getState().resetToDefaults?.()
-    global.localStorage = {}
-    global.sessionStorage = {}
+    window.localStorage.clear()
+    window.sessionStorage.clear()
+    global.localStorage = window.localStorage
+    global.sessionStorage = window.sessionStorage
     vi.clearAllMocks()
   })
 
