@@ -34,29 +34,32 @@ global.AudioContext = class MockAudioContext {
 }
 
 // Mock localStorage and sessionStorage
+const localStore = {}
+const sessionStore = {}
+
 Object.defineProperty(window, 'localStorage', {
   value: {
-    getItem: (key) => global.localStorage[key] || null,
-    setItem: (key, value) => { global.localStorage[key] = value },
-    removeItem: (key) => { delete global.localStorage[key] },
-    clear: () => { global.localStorage = {} }
+    getItem: (key) => localStore[key] || null,
+    setItem: (key, value) => { localStore[key] = value },
+    removeItem: (key) => { delete localStore[key] },
+    clear: () => { Object.keys(localStore).forEach((key) => delete localStore[key]) }
   },
   writable: true
 })
 
 Object.defineProperty(window, 'sessionStorage', {
   value: {
-    getItem: (key) => global.sessionStorage[key] || null,
-    setItem: (key, value) => { global.sessionStorage[key] = value },
-    removeItem: (key) => { delete global.sessionStorage[key] },
-    clear: () => { global.sessionStorage = {} }
+    getItem: (key) => sessionStore[key] || null,
+    setItem: (key, value) => { sessionStore[key] = value },
+    removeItem: (key) => { delete sessionStore[key] },
+    clear: () => { Object.keys(sessionStore).forEach((key) => delete sessionStore[key]) }
   },
   writable: true
 })
 
-// Initialize storage objects
-global.localStorage = {}
-global.sessionStorage = {}
+// Expose storage mocks globally for code that references the global objects
+global.localStorage = window.localStorage
+global.sessionStorage = window.sessionStorage
 
 // Mock window.location
 Object.defineProperty(window, 'location', {
