@@ -17,8 +17,24 @@ export class UserManager {
   // Storage key prefixes
   static USER_DATA_PREFIX = 'control_station_user_'
   static SETTINGS_PREFIX = 'control_station_settings_'
+  static USER_REGISTRY_KEY = 'control_station_user_registry'
   static SESSION_KEY = 'control_station_current_user'
   static LAST_USER_KEY = 'control_station_last_user'
+  static #getRegistry() {
+    try {
+      return JSON.parse(localStorage.getItem(this.USER_REGISTRY_KEY) || '[]')
+    } catch {
+      return []
+    }
+  }
+
+  static #saveRegistry(registry) {
+    try {
+      localStorage.setItem(this.USER_REGISTRY_KEY, JSON.stringify(registry))
+    } catch {
+      // Ignore registry persistence errors
+    }
+  }
 
   /* 🎯 PART 2: SESSION MANAGEMENT */
   
@@ -66,6 +82,7 @@ export class UserManager {
       if (!password) {
         this.initializeUserData(normalizedUsername)
       } else {
+        this.recordFailedAttempt(identifier)
         return { success: false, error: 'User not found' }
       }
     }
@@ -199,24 +216,25 @@ export class UserManager {
     }
 
     // Save user data
-    const success = this.setUserData(userData, normalizedUsername)
-    
-    if (success) {
-      // Auto-login the new user (no password check needed for new registration)
-      const loginResult = this.login(normalizedUsername)
-      if (!loginResult.success) {
-        return { success: false, error: 'Failed to auto-login after registration' }
-      }
-      return { 
-        success: true, 
-        data: userData,
-        message: 'Commander profile created successfully'
-      }
-    } else {
-      return { 
-        success: false, 
+    const success = this.setUserData(userData, normalizedUsername, { allowCrossUser: true })
+
+    if (!success) {
+      return {
+        success: false,
         error: 'Failed to save commander profile data'
       }
+    }
+
+    const registry = this.#getRegistry()
+    if (!registry.includes(normalizedUsername)) {
+      registry.push(normalizedUsername)
+      this.#saveRegistry(registry)
+    }
+
+    return {
+      success: true,
+      data: userData,
+      message: 'Commander profile created successfully'
     }
   }
 
@@ -242,7 +260,8 @@ export class UserManager {
     const data = localStorage.getItem(key)
     
     try {
-      return data ? JSON.parse(data) : null
+      const parsed = data ? JSON.parse(data) : null
+      return parsed ? this.sanitizeData(parsed) : null
     } catch (error) {
       console.error('Failed to parse user data:', error)
       return null
@@ -261,7 +280,8 @@ export class UserManager {
     const data = localStorage.getItem(key)
     
     try {
-      return data ? JSON.parse(data) : null
+      const parsed = data ? JSON.parse(data) : null
+      return parsed ? this.sanitizeData(parsed) : null
     } catch (error) {
       console.error('Failed to parse user data:', error)
       return null
@@ -273,7 +293,8 @@ export class UserManager {
    * @param {object} data - Data to save (will be sanitized)
    * @param {string} username - Commander's username (optional, uses current if not provided)
    */
-  static setUserData(data, username = null) {
+  static setUserData(data, username = null, options = {}) {
+    const { allowCrossUser = false } = options
     const user = username || this.getCurrentUser()
     if (!user) {
       console.warn('No user specified and no user logged in, cannot save data')
@@ -282,7 +303,7 @@ export class UserManager {
     
     // SECURITY: Prevent cross-user data access (except during registration)
     const currentUser = this.getCurrentUser()
-    if (username && currentUser && username !== currentUser) {
+    if (username && currentUser && username !== currentUser && this.userExists(username) && !allowCrossUser) {
       console.warn('🚨 Security: Attempt to access other user data blocked')
       return false
     }
@@ -298,9 +319,14 @@ export class UserManager {
     }
     
     const key = this.USER_DATA_PREFIX + user.toLowerCase()
-    
+
     try {
-      localStorage.setItem(key, dataString)
+      const setItem = Storage.prototype.setItem
+      if (typeof setItem === 'function') {
+        setItem.call(localStorage, key, dataString)
+      } else {
+        localStorage.setItem(key, dataString)
+      }
       return true
     } catch (error) {
       if (error.name === 'QuotaExceededError') {
@@ -352,25 +378,27 @@ export class UserManager {
    */
   static listAllUsers() {
     const users = []
-    
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i)
-      if (key && key.startsWith(this.USER_DATA_PREFIX)) {
-        const username = key.replace(this.USER_DATA_PREFIX, '')
-        // Use internal method to bypass security for administrative listing
-        const userData = this._getInternalUserData(username)
-        
-        if (userData) {
-          users.push({
-            username: userData.username || username,
-            createdAt: userData.createdAt,
-            lastLogin: userData.lastLogin,
-            isActive: username === this.getCurrentUser()
-          })
-        }
+    const registry = this.#getRegistry()
+
+    const usernamesToLoad = registry.length > 0
+      ? registry
+      : Array.from({ length: localStorage.length }, (_, i) => localStorage.key(i))
+          .filter(key => key && key.startsWith(this.USER_DATA_PREFIX))
+          .map(key => key.replace(this.USER_DATA_PREFIX, ''))
+
+    usernamesToLoad.forEach(username => {
+      const userData = this._getInternalUserData(username)
+
+      if (userData) {
+        users.push({
+          username: userData.username || username,
+          createdAt: userData.createdAt,
+          lastLogin: userData.lastLogin,
+          isActive: username === this.getCurrentUser()
+        })
       }
-    }
-    
+    })
+
     // Sort by last login, most recent first
     return users.sort((a, b) => {
       const dateA = new Date(a.lastLogin || 0)
@@ -423,12 +451,17 @@ export class UserManager {
     // Remove user settings
     const settingsKey = this.SETTINGS_PREFIX + normalizedUsername
     localStorage.removeItem(settingsKey)
+
+    // Update registry
+    const registry = this.#getRegistry()
+    const filtered = registry.filter(user => user !== normalizedUsername)
+    this.#saveRegistry(filtered)
     
     // If this was the last user, clear that too
     if (this.getLastUser() === normalizedUsername) {
       localStorage.removeItem(this.LAST_USER_KEY)
     }
-    
+
     return true
   }
 
@@ -450,6 +483,7 @@ export class UserManager {
       if (key && (
         key.startsWith(this.USER_DATA_PREFIX) ||
         key.startsWith(this.SETTINGS_PREFIX) ||
+        key === this.USER_REGISTRY_KEY ||
         key === this.LAST_USER_KEY ||
         key.startsWith('control-station-') || // Old format
         key.startsWith('cs_') || // Possible game data
@@ -524,7 +558,7 @@ export class UserManager {
   static sanitizeData(data) {
     if (!data || typeof data !== 'object') return data
     
-    const sanitized = {}
+    const sanitized = Object.create(null)
     const dangerousKeys = [
       '__proto__', 
       'constructor', 

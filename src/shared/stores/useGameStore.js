@@ -9,6 +9,7 @@ import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { integratePunishmentSystem } from '../utils/PunishmentSystem'
 import { XP_VALUES, ACHIEVEMENT_XP, getTaskXP } from '../config/xp.config'
+import { AudioFeedbackSystem, VariableRewardSystem } from '../utils/AddictionEngine'
 import UserManager from '../../features/auth/UserManager'
 // Lazy load AddictionEngine to prevent blocking startup
 let AddictionEngineModule = null
@@ -502,6 +503,12 @@ const useGameStore = create(
       
       /* 💰 XP & LEVEL MANAGEMENT - ADDICTION ENGINE POWERED! */
       addXP: (amount, source = 'Unknown', options = {}) => {
+        const numericAmount = Number(amount)
+
+        if (!Number.isFinite(numericAmount)) {
+          return null
+        }
+
         const state = get()
         
         // MUTEX LOCK - Prevent concurrent XP additions with timeout
@@ -525,14 +532,14 @@ const useGameStore = create(
           AddictionEngineModule?.AddictionMetrics?.trackBehavior('xp_gain', { xp: amount, source })
           
           // Handle negative XP through punishment system
-          if (amount < 0 && state.settings.punishmentEnabled && state.punishmentEngine) {
-            const result = state.punishmentEngine.punish(-amount, source)
+          if (numericAmount < 0 && state.settings.punishmentEnabled && state.punishmentEngine) {
+            const result = state.punishmentEngine.punish(-numericAmount, source)
             set({ isProcessingXP: false, xpLockTimestamp: 0 })
             return result
           }
           
           // 🧠 USE ADDICTION ENGINE FOR VARIABLE REWARDS!
-          let rewardData = { finalXP: amount, bonusType: null, message: null }
+          let rewardData = { finalXP: numericAmount, bonusType: null, message: null }
           
           // Initialize addiction engine if not exists
           if (!state.variableRewardSystem) {
@@ -554,17 +561,17 @@ const useGameStore = create(
                            options.taskType || 'standard'
             
             // 🎰 CALCULATE VARIABLE REWARD (SLOT MACHINE PSYCHOLOGY)
-            rewardData = state.variableRewardSystem.calculateReward(amount, taskType)
+            rewardData = state.variableRewardSystem.calculateReward(numericAmount, taskType)
             
             // Play audio feedback if enabled
             if (state.settings.soundEnabled) {
               AudioFeedbackSystem.playRewardSound(rewardData.bonusType || 'standard')
             }
           } else {
-            rewardData.finalXP = amount
+            rewardData.finalXP = numericAmount
           }
-          
-          const baseAmount = Math.floor(amount)
+
+          const baseAmount = Math.floor(numericAmount)
           const totalAmount = Math.floor(rewardData.finalXP)
           const bonusAmount = totalAmount - baseAmount
           
@@ -1223,6 +1230,16 @@ const useGameStore = create(
       /* 🔄 CLEAR XP TRANSACTION LOG - NEW! */
       clearXPTransactionLog: () => {
         set({ xpTransactionLog: [] })
+      },
+
+      /* 🧹 TESTING: RESET TO BASELINE STATE */
+      resetToDefaults: () => {
+        set(() => ({
+          ...INITIAL_STATE,
+          settings: { ...INITIAL_STATE.settings },
+          stats: { ...INITIAL_STATE.stats },
+          xpTransactionLog: [],
+        }))
       },
     }),
     {

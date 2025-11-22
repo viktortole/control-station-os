@@ -225,14 +225,14 @@ describe('useGameStore', () => {
       
       // Try to complete non-existent task
       act(() => {
-        const result = result.current.completeTask('invalid-id')
-        expect(result).toBeFalsy()
+        const completionResult = result.current.completeTask('invalid-id')
+        expect(completionResult).toBeFalsy()
       })
-      
-      // Try to delete non-existent task  
+
+      // Try to delete non-existent task
       act(() => {
-        const result = result.current.deleteTask('invalid-id')
-        expect(result).toBeFalsy()
+        const deleteResult = result.current.deleteTask('invalid-id')
+        expect(deleteResult).toBeFalsy()
       })
     })
 
