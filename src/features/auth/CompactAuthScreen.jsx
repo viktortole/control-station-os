@@ -1,7 +1,8 @@
-// ╭──────────────────────────────────────────────────────────────────────────────╮
-// │ Control Station OS - Auth Screen                                             │
-// │ Tactical theme, professional desktop feel                                    │
-// ╰──────────────────────────────────────────────────────────────────────────────╯
+
+// ????????????????????????????????????????????????????????????????????????????????
+// ? Control Station OS - Auth Screen                                             ?
+// ? Tactical theme, professional desktop feel                                    ?
+// ????????????????????????????????????????????????????????????????????????????????
 
 import React, { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -192,7 +193,7 @@ export default function CompactAuthScreen({ onAuthenticate }) {
         }
         setIsProcessing(false)
       } catch (error) {
-        console.error('🚨 Authentication error:', error)
+        console.error('?? Authentication error:', error)
         setAuthError('SYSTEM ERROR: ' + error.message)
         setIsProcessing(false)
         TacticalAudio.punishment()
@@ -224,14 +225,15 @@ export default function CompactAuthScreen({ onAuthenticate }) {
   }
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center p-6 overflow-y-auto bg-[#050608]">
+    <div className="fixed inset-0 flex items-center justify-center p-6 overflow-y-auto bg-[#050608] relative">
       <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_20%_20%,rgba(255,88,88,0.14),transparent_30%),radial-gradient(circle_at_78%_18%,rgba(16,185,129,0.12),transparent_28%),radial-gradient(circle_at_50%_80%,rgba(59,130,246,0.14),transparent_32%)]" />
       <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:60px_60px]" />
+      <div className="absolute inset-x-0 bottom-0 h-1/3 pointer-events-none bg-gradient-to-t from-black via-black/70 to-transparent" />
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[360px] h-[360px] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.05),transparent_60%)] pointer-events-none" />
 
-      <div className="relative w-full max-w-6xl mx-auto space-y-4">
+      <div className="relative w-full max-w-6xl mx-auto space-y-4 z-10 pointer-events-auto">
         {/* In-app header bar */}
-        <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-[#0b0c10]/85 px-4 py-2 shadow-[0_10px_30px_rgba(0,0,0,0.4)]">
+        <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-[#0b0c10]/85 px-4 py-2 shadow-[0_10px_30px_rgba(0,0,0,0.4)] relative z-10">
           <div className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-lg bg-red-600/85 flex items-center justify-center text-white font-black text-sm border border-white/20">CS</div>
             <div>
@@ -252,25 +254,27 @@ export default function CompactAuthScreen({ onAuthenticate }) {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.35, ease: 'easeOut' }}
-            className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-white/5 via-white/2 to-white/5 p-7 md:p-8 shadow-[0_20px_70px_rgba(0,0,0,0.55)]"
+            className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-white/5 via-white/2 to-white/5 p-6 md:p-7 shadow-[0_20px_70px_rgba(0,0,0,0.55)] z-10 max-w-lg"
           >
-            <div className="absolute inset-0 opacity-50 bg-[radial-gradient(circle_at_15%_20%,rgba(255,255,255,0.04),transparent_28%),radial-gradient(circle_at_75%_20%,rgba(255,255,255,0.05),transparent_28%),linear-gradient(135deg,rgba(255,255,255,0.02),transparent_45%)]" />
+            <div className="absolute inset-0 opacity-50 bg-[radial-gradient(circle_at_15%_20%,rgba(255,255,255,0.04),transparent_28%),radial-gradient(circle_at_75%_20%,rgba(255,255,255,0.05),transparent_28%),linear-gradient(135deg,rgba(255,255,255,0.02),transparent_45%)] pointer-events-none" />
             <div className="relative flex items-center gap-6">
               <div className="relative">
-                <div className="absolute inset-0 blur-3xl bg-red-500/18 scale-125" />
+                <div className="absolute inset-0 blur-3xl bg-red-500/18 scale-125 pointer-events-none" />
                 <CommandEmblem size={140} className="flex-shrink-0 relative" />
               </div>
-              <div className="space-y-2">
-                <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-emerald-200">Control Station OS</p>
-                <h1 className="text-3xl font-black text-white tracking-wide leading-tight">Mission Access Console</h1>
-                <p className="text-sm text-white/75 max-w-xl">
-                  Secure entry to operations, telemetry, and command modules. Clearance is required to unlock mission control.
+              <div className="space-y-3 w-full max-w-md">
+                <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-amber-200">Control Station OS / Access</p>
+                <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight leading-snug whitespace-normal break-words">
+                  Mission Access Console
+                </h1>
+                <p className="text-sm text-white/75 leading-relaxed">
+                  Secure entry to operations, telemetry, and command modules. Authenticate once, keep state, and resume without friction.
                 </p>
-                <div className="flex flex-wrap gap-2 pt-2">
-                  {['Secure Sessions', 'Multi-Commander', 'Fast Launch'].map(label => (
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {['Keyboard-first', 'Stateful resume'].map(label => (
                     <span
                       key={label}
-                      className="px-3 py-1 rounded-full text-[11px] font-semibold tracking-wide bg-white/8 text-white/80 border border-white/10"
+                      className="px-3 py-1 rounded-full text-[11px] font-semibold tracking-wide bg-white/8 text-white/85 border border-white/10"
                     >
                       {label}
                     </span>
@@ -278,26 +282,7 @@ export default function CompactAuthScreen({ onAuthenticate }) {
                 </div>
               </div>
             </div>
-            <div className="relative mt-6 grid grid-cols-2 gap-3">
-              {[
-                { title: 'Readiness', value: '99.9%', accent: 'from-green-500/50 to-emerald-400/30' },
-                { title: 'System Load', value: 'CPU 18% • RAM 42%', accent: 'from-sky-400/30 to-cyan-300/15' },
-                { title: 'Latency', value: '<120ms', accent: 'from-slate-400/30 to-slate-500/15' },
-                { title: 'Last Session', value: 'Focus 52m • XP +75 • End 06:40', accent: 'from-amber-400/30 to-yellow-300/15' }
-              ].map((card) => (
-                <div
-                  key={card.title}
-                  className={`rounded-2xl border border-white/10 bg-gradient-to-br ${card.accent} p-3 text-white/90 shadow-[0_6px_18px_rgba(0,0,0,0.25)] relative overflow-hidden`}
-                >
-                  <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-emerald-300 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.6)]" aria-hidden="true" />
-                  <p className="text-[11px] uppercase tracking-[0.14em] text-white/70 font-semibold">{card.title}</p>
-                  <p className="text-lg font-black mt-1 leading-tight">{card.value}</p>
-                </div>
-              ))}
-            </div>
           </motion.div>
-
-          {/* Center HUD */}
           <div className="hidden lg:flex flex-col items-center gap-3 text-white/65">
             <div className="w-32 h-32 rounded-full border border-white/10 bg-gradient-to-br from-white/5 to-white/0 relative overflow-hidden">
               <div className="absolute inset-4 rounded-full border border-white/10" />
@@ -328,18 +313,14 @@ export default function CompactAuthScreen({ onAuthenticate }) {
             className="relative bg-[#0b0c10]/95 backdrop-blur-xl rounded-3xl p-6 md:p-7 border border-white/12 shadow-[0_18px_60px_rgba(0,0,0,0.55)] max-w-lg w-full mx-auto overflow-hidden"
           >
             <div className="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.04),transparent_35%),radial-gradient(circle_at_80%_10%,rgba(255,255,255,0.05),transparent_32%)] pointer-events-none" />
-            <div className="absolute inset-0 opacity-10 bg-[linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:48px_48px]" />
+            <div className="absolute inset-0 opacity-10 bg-[linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:48px_48px] pointer-events-none" />
 
             {/* Header */}
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center mb-3">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-red-300">Security Clearance</p>
                 <h2 className="text-2xl font-black text-white tracking-wide leading-tight">Control Station OS</h2>
                 <p className="text-[12px] text-white/60 mt-1">Authenticate to access mission control and telemetry modules.</p>
-              </div>
-              <div className="flex flex-col items-end gap-1 text-white/65 text-[11px] font-mono">
-                <span className="px-2 py-1 rounded-md bg-white/5 border border-white/10">Build: Tactical</span>
-                <span className="px-2 py-1 rounded-md bg-white/5 border border-white/10">Access: Multi-user</span>
               </div>
             </div>
 
@@ -373,20 +354,6 @@ export default function CompactAuthScreen({ onAuthenticate }) {
                   Register
                 </div>
               </button>
-            </div>
-
-            {/* Access hints */}
-            <div className="grid grid-cols-2 gap-2 mb-3">
-              <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2">
-                <p className="text-[11px] font-mono uppercase tracking-[0.12em] text-white/70">Primary</p>
-                <p className="text-sm font-semibold text-white">Standard Login</p>
-                <p className="text-[11px] text-white/50">Local secure channel</p>
-              </div>
-              <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2">
-                <p className="text-[11px] font-mono uppercase tracking-[0.12em] text-white/70">Alternate</p>
-                <p className="text-sm font-semibold text-white">Admin Override</p>
-                <p className="text-[11px] text-white/50">Operator credentials</p>
-              </div>
             </div>
 
             {/* Admin quick login */}
@@ -551,7 +518,7 @@ export default function CompactAuthScreen({ onAuthenticate }) {
 
             <div className="mt-4 text-center">
               <p className="text-xs text-blue-400/40 font-mono uppercase tracking-[0.18em]">
-                Focus • Progress • Results
+                Focus ? Progress ? Results
               </p>
             </div>
           </motion.div>
