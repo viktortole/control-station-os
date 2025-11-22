@@ -74,10 +74,14 @@ function NewUserOnboarding({ onQuickStart }) {
 
 /* 📊 PART 2: COMPACT LEVEL PROGRESS CARD */
 function LevelProgressCard({ level, totalXP }) {
-  const currentLevelXP = Math.pow(level - 1, 2) * 100
-  const nextLevelXP = Math.pow(level, 2) * 100
-  const levelProgress = ((totalXP - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100
-  const xpToNext = nextLevelXP - totalXP
+  const safeLevel = Number.isFinite(Number(level)) ? Math.max(1, Number(level)) : 1
+  const numericTotal = Number(totalXP ?? 0)
+  const safeTotalXP = Number.isFinite(numericTotal) ? Math.max(0, numericTotal) : 0
+  const currentLevelXP = Math.max(0, Math.pow(safeLevel - 1, 2) * 100)
+  const nextLevelXP = Math.max(currentLevelXP + 100, Math.pow(safeLevel, 2) * 100)
+  const rawProgress = (safeTotalXP - currentLevelXP) / (nextLevelXP - currentLevelXP || 1)
+  const levelProgress = Math.max(0, Math.min(100, rawProgress * 100))
+  const xpToNext = Math.max(0, Math.round(nextLevelXP - safeTotalXP))
   
   return (
     <motion.div
@@ -95,7 +99,7 @@ function LevelProgressCard({ level, totalXP }) {
             <Trophy className="w-3.5 h-3.5 text-yellow-400" />
             <span className="text-xs font-bold text-white/80 uppercase tracking-wider">Level</span>
           </div>
-          <span className="text-xl font-black text-white">{level}</span>
+            <span className="text-xl font-black text-white">{safeLevel}</span>
         </div>
         
         {/* XP Progress Bar */}
@@ -112,14 +116,14 @@ function LevelProgressCard({ level, totalXP }) {
               transition={{ duration: 1, ease: "easeOut" }}
             />
           </div>
-          <div className="flex justify-between text-[10px] text-white/50">
-            <span>{totalXP.toLocaleString()}</span>
-            <span>{xpToNext} to next</span>
+            <div className="flex justify-between text-[10px] text-white/50">
+              <span>{Number(safeTotalXP || 0).toLocaleString()}</span>
+              <span>{Number(xpToNext || 0).toLocaleString()} to next</span>
+            </div>
           </div>
         </div>
-      </div>
-    </motion.div>
-  )
+      </motion.div>
+    )
 }
 
 /* 📈 PART 3: DAILY GOAL PROGRESS */

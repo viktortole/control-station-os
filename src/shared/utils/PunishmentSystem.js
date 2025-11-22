@@ -86,6 +86,15 @@ export class PunishmentEngine {
     this.soundCache = new Map()
     
     this.initializeSystem()
+
+      // Track first user interaction to unlock audio
+      const gestureHandler = () => {
+        this.hasUserGesture = true
+        window.removeEventListener('click', gestureHandler)
+        window.removeEventListener('keydown', gestureHandler)
+      }
+      window.addEventListener('click', gestureHandler, { once: true })
+      window.addEventListener('keydown', gestureHandler, { once: true })
   }
   
   /* 🚀 PART 3: SYSTEM INITIALIZATION - NON-BLOCKING */
@@ -425,6 +434,9 @@ export class PunishmentEngine {
   
   // Enhanced audio system
   async playPunishmentSound(type) {
+      if (!this.hasUserGesture) {
+        return null
+      }
     const soundMap = {
       standard: '/sounds/punishment.mp3',
       mission_failure: '/sounds/mission-failed.mp3',
